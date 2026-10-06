@@ -1,0 +1,16 @@
+{
+  "name": "Mochi Bot",
+  "version": "0.1.0",
+  "new_install_prompt_erase": true,
+  "builds": [
+    {
+      "chipFamily": "ESP32-C3",
+      "parts": [
+        { "path": "esp32c3/bootloader.bin",  "offset": 0 },
+        { "path": "esp32c3/partitions.bin",  "offset": 32768 },
+        { "path": "esp32c3/boot_app0.bin",   "offset": 57344 },
+        { "path": "esp32c3/mochi.bin",       "offset": 65536 }
+      ]
+    }
+  ]
+}

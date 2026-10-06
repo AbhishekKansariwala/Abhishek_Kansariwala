@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mochi Bot — Firmware Installer</title>
+<meta name="description" content="Flash the Mochi desktop robot firmware onto an ESP32-C3 straight from your browser. No IDE, no drivers." />
+<meta name="color-scheme" content="dark light" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#129370;</text></svg>" />
+<link rel="stylesheet" href="assets/css/styles.css" />
+<script type="module" src="vendor/esp-web-tools/install-button.js"></script>
+<script defer src="assets/js/main.js"></script>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="./">
+    <span class="brand-mark" aria-hidden="true">🍡</span>
+    <span class="brand-name">Mochi Bot</span>
+  </a>
+  <nav class="topnav">
+    <a href="#install">Install</a>
+    <a href="#hardware">Hardware</a>
+    <a href="#setup">Wi-Fi setup</a>
+    <a href="#help">Help</a>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ============================ HERO / FLASHER ============================ -->
+  <section class="hero" id="install">
+    <p class="eyebrow">Browser firmware installer</p>
+    <h1>Build your own<br /><span class="accent">desktop companion</span></h1>
+    <p class="lede">
+      A palm-sized robot on a Waveshare <strong>ESP32-C3</strong> — OLED face, microphone,
+      speaker and touch buttons. Plug it in and flash the firmware right here.
+      No Arduino IDE, no drivers, nothing to download.
+    </p>
+
+    <div class="flash-card">
+      <div class="flash-card-head">
+        <div>
+          <h2>Install firmware</h2>
+          <p class="muted" id="fw-meta">Reading firmware manifest…</p>
+        </div>
+        <span class="chip" id="chip-badge">ESP32-C3</span>
+      </div>
+
+      <esp-web-install-button manifest="firmware/manifest.json">
+        <button slot="activate" class="btn btn-primary">
+          <span aria-hidden="true">⚡</span> Connect &amp; install
+        </button>
+
+        <div slot="unsupported" class="notice notice-warn">
+          <strong>This browser can’t flash.</strong>
+          Flashing uses the Web Serial API, which only desktop
+          <strong>Chrome</strong>, <strong>Edge</strong> and <strong>Opera</strong> support.
+          Safari, Firefox and mobile browsers will not work — reopen this page in one of those.
+        </div>
+
+        <div slot="not-allowed" class="notice notice-warn">
+          <strong>Serial access is blocked.</strong>
+          The page must be served over <code>https://</code> (or <code>localhost</code>),
+          and you may need to allow serial access for this site in your browser settings.
+        </div>
+      </esp-web-install-button>
+
+      <ol class="steps">
+        <li>
+          <span class="step-n">1</span>
+          <div>
+            <h3>Enter flash mode</h3>
+            <p>Hold the <kbd>BOOT</kbd> button on the board <em>while</em> you plug in the USB-C cable, then release it.</p>
+          </div>
+        </li>
+        <li>
+          <span class="step-n">2</span>
+          <div>
+            <h3>Pick the port</h3>
+            <p>Hit <em>Connect &amp; install</em> and choose your board’s serial port in the browser prompt, then confirm the install.</p>
+          </div>
+        </li>
+        <li>
+          <span class="step-n">3</span>
+          <div>
+            <h3>Hand over your Wi-Fi</h3>
+            <p>When flashing finishes, join the robot’s setup hotspot and give it your network and API keys. <a href="#setup">Details below.</a></p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============================== HARDWARE =============================== -->
+  <section class="section" id="hardware">
+    <h2>What you need to build one</h2>
+    <p class="muted">The reference build. Swap parts freely — the firmware's pin map lives in <code>config.h</code>.</p>
+    <div class="table-wrap">
+      <table class="bom">
+        <thead>
+          <tr><th>Part</th><th>Role</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Waveshare ESP32-C3 (Zero / Supermini)</td><td>Brain + Wi-Fi</td><td>Native USB-C, RISC-V core</td></tr>
+          <tr><td>SSD1306 0.96" OLED</td><td>The face</td><td>128×64, I²C</td></tr>
+          <tr><td>INMP441</td><td>Microphone</td><td>I²S digital mic</td></tr>
+          <tr><td>MAX98357A + 2 W speaker</td><td>Voice out</td><td>I²S class-D amp</td></tr>
+          <tr><td>3 × TTP223 touch pads</td><td>Input</td><td>Ask / menu / wake</td></tr>
+          <tr><td>LiPo cell + TP4056</td><td>Power</td><td>Use a protected cell</td></tr>
+          <tr><td>Slide switch</td><td>On / off</td><td>In line with the battery</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============================= WIFI SETUP ============================== -->
+  <section class="section" id="setup">
+    <h2>First-boot setup</h2>
+    <div class="cards">
+      <article class="card">
+        <h3>1. Join the hotspot</h3>
+        <p>After the first boot the robot opens its own access point. Connect to it from your phone or laptop — the captive portal opens automatically.</p>
+        <p class="ssid">SSID <code id="setup-ssid">Mochi-Setup</code></p>
+      </article>
+      <article class="card">
+        <h3>2. Enter credentials</h3>
+        <p>Give it your Wi-Fi SSID and password, plus any API keys the firmware needs for speech and weather.</p>
+      </article>
+      <article class="card">
+        <h3>3. It reboots</h3>
+        <p>The robot restarts, joins your network and shows its face. Hold the touch button and ask it something.</p>
+      </article>
+    </div>
+    <div class="notice notice-info">
+      Keys are stored in the ESP32's own flash. Re-flashing erases them, so you'll redo this step after each update.
+    </div>
+  </section>
+
+  <!-- ============================ TROUBLESHOOT ============================= -->
+  <section class="section" id="help">
+    <h2>When it won't cooperate</h2>
+    <dl class="faq">
+      <dt>No port shows up in the prompt</dt>
+      <dd>Nearly always the cable — plenty of USB-C cables are charge-only. Try another, and plug straight into the computer rather than through a hub.</dd>
+
+      <dt>"Failed to initialize" or it connects then drops</dt>
+      <dd>The board isn't in bootloader mode. Unplug, hold <kbd>BOOT</kbd>, plug in, release, and try again.</dd>
+
+      <dt>Flashing works but the screen stays dark</dt>
+      <dd>Check the OLED's I²C wiring and address (<code>0x3C</code> vs <code>0x3D</code>), and that it's a 3.3 V part.</dd>
+
+      <dt>It never joins my Wi-Fi</dt>
+      <dd>The ESP32-C3 is 2.4 GHz only. A 5 GHz-only SSID is invisible to it.</dd>
+
+      <dt>I want to start clean</dt>
+      <dd>Re-run the installer and pick <em>Erase device</em> before installing. That wipes stored credentials too.</dd>
+    </dl>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <p>Built for the Mochi desktop robot. Flashing by
+    <a href="https://esphome.github.io/esp-web-tools/" rel="noopener">ESP Web Tools</a>.</p>
+  <p class="muted small">Works in desktop Chrome, Edge and Opera. Requires HTTPS.</p>
+</footer>
+
+</body>
+</html>
