@@ -1,6 +1,6 @@
-# Mochi Bot — browser firmware installer
+# Dasai Mochi — browser firmware installer
 
-A static site that flashes ESP32 firmware for the Mochi desktop robot straight from
+A static site that flashes ESP32 firmware for the Dasai Mochi desktop robot straight from
 the browser, in the style of [themochi.huykhong.com](https://themochi.huykhong.com/).
 No build step, no framework — open `index.html` and that's the whole site.
 
@@ -52,7 +52,7 @@ browser refuses serial access.
   `/docs` folder) and enable Pages. `.nojekyll` is already here.
 - **Cloudflare Pages / Netlify / Vercel** — no build command, output directory `/`.
 
-Binaries are served as plain static files, so a large `mochi.bin` counts against
+Binaries are served as plain static files, so a large `dasaimochi.bin` counts against
 whatever file-size limits your host has.
 
 ## Credit

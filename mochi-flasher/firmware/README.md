@@ -13,7 +13,7 @@ firmware/
     bootloader.bin
     partitions.bin
     boot_app0.bin
-    mochi.bin        <- your application
+    dasaimochi.bin   <- your application
 ```
 
 ## Where the files come from
@@ -47,7 +47,7 @@ If you'd rather ship one file (`esptool.py merge_bin` output), replace the `part
 array with a single entry at offset 0:
 
 ```json
-"parts": [{ "path": "esp32c3/mochi-merged.bin", "offset": 0 }]
+"parts": [{ "path": "esp32c3/dasaimochi-merged.bin", "offset": 0 }]
 ```
 
 ## Adding another board

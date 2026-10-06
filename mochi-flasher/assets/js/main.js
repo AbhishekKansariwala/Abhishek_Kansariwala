@@ -5,7 +5,7 @@
    ======================================================================= */
 
 // The hotspot the firmware opens on first boot. Must match the firmware.
-const SETUP_SSID = "Mochi-Setup";
+const SETUP_SSID = "DasaiMochi-Setup";
 
 const MANIFEST_URL = "firmware/manifest.json";
 
