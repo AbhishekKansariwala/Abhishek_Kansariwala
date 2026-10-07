@@ -1,0 +1,93 @@
+name: Firmware
+
+on:
+  push:
+    paths:
+      - 'firmware/**'
+      - '.github/workflows/firmware.yml'
+  pull_request:
+    paths:
+      - 'firmware/**'
+      - '.github/workflows/firmware.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build ESP32-C3 firmware
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Cache PlatformIO
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.platformio
+            ~/.cache/pip
+          key: pio-${{ runner.os }}-${{ hashFiles('firmware/platformio.ini') }}
+          restore-keys: pio-${{ runner.os }}-
+
+      - name: Install PlatformIO
+        run: pip install --upgrade platformio
+
+      - name: Build
+        working-directory: firmware
+        run: pio run
+
+      - name: Collect flashable parts
+        id: collect
+        run: |
+          set -euo pipefail
+          BUILD=firmware/.pio/build/esp32c3
+          OUT=dist/esp32c3
+          mkdir -p "$OUT"
+
+          cp "$BUILD/firmware.bin"    "$OUT/dasaimochi.bin"
+          cp "$BUILD/bootloader.bin"  "$OUT/bootloader.bin"
+          cp "$BUILD/partitions.bin"  "$OUT/partitions.bin"
+
+          # boot_app0 ships with the Arduino core rather than the build dir.
+          BOOT_APP0=$(find ~/.platformio/packages -name boot_app0.bin -print -quit)
+          if [ -z "$BOOT_APP0" ]; then
+            echo "::error::boot_app0.bin not found in the installed framework"
+            exit 1
+          fi
+          cp "$BOOT_APP0" "$OUT/boot_app0.bin"
+
+          echo "Sizes:"; ls -l "$OUT"
+
+      - name: Write manifest for the web installer
+        run: |
+          set -euo pipefail
+          VERSION="0.2.0+${GITHUB_SHA::7}"
+          cat > dist/manifest.json <<JSON
+          {
+            "name": "Dasai Mochi",
+            "version": "$VERSION",
+            "new_install_prompt_erase": true,
+            "builds": [
+              {
+                "chipFamily": "ESP32-C3",
+                "parts": [
+                  { "path": "esp32c3/bootloader.bin", "offset": 0 },
+                  { "path": "esp32c3/partitions.bin", "offset": 32768 },
+                  { "path": "esp32c3/boot_app0.bin",  "offset": 57344 },
+                  { "path": "esp32c3/dasaimochi.bin", "offset": 65536 }
+                ]
+              }
+            ]
+          }
+          JSON
+          python3 -c "import json;json.load(open('dist/manifest.json'));print('manifest OK')"
+
+      - name: Upload firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: dasaimochi-esp32c3
+          path: dist/
+          if-no-files-found: error
