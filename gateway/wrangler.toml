@@ -1,0 +1,11 @@
+# Cloudflare Workers deployment. Keys are secrets, never committed:
+#   wrangler secret put DEVICE_TOKEN
+#   wrangler secret put GEMINI_API_KEYS
+#   wrangler secret put ANTHROPIC_API_KEYS
+name = "dasai-mochi-gateway"
+main = "src/index.mjs"
+compatibility_date = "2026-10-01"
+
+[vars]
+PROVIDER_ORDER = "gemini,anthropic,groq,openai"
+COOLDOWN_MS = "60000"

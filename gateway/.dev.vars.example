@@ -1,0 +1,7 @@
+# Copy to .dev.vars (gitignored) for local runs. Never commit real keys.
+DEVICE_TOKEN=change-me-long-random-string
+PROVIDER_ORDER=gemini,anthropic,groq
+GEMINI_API_KEYS=key1,key2
+ANTHROPIC_API_KEYS=key1
+GROQ_API_KEYS=key1
+SYSTEM_PROMPT=You are Dasai Mochi, a small desk robot. Answer in one or two short sentences.
