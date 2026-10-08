@@ -75,5 +75,7 @@ flashable parts plus a `manifest.json` the web installer can serve.
 ## Status
 
 Implemented: display, animation, touch, working audio.
-Not yet implemented: Wi-Fi, setup portal, microphone capture, AI. The pin map
-and the second touch pad are in place for them.
+
+Out of scope: Wi-Fi, microphone capture and any AI. This firmware is entirely
+offline by design. The pin map still reserves a second touch pad and an I2S
+input pin, so adding them later costs no rewiring.

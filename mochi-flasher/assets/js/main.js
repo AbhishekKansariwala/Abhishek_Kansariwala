@@ -4,9 +4,6 @@
    actual flashing is handled by <esp-web-install-button>.
    ======================================================================= */
 
-// The hotspot the firmware opens on first boot. Must match the firmware.
-const SETUP_SSID = "DasaiMochi-Setup";
-
 const MANIFEST_URL = "firmware/manifest.json";
 
 function text(id, value) {
@@ -15,8 +12,6 @@ function text(id, value) {
 }
 
 async function hydrate() {
-  text("setup-ssid", SETUP_SSID);
-
   let manifest;
   try {
     const res = await fetch(MANIFEST_URL, { cache: "no-store" });

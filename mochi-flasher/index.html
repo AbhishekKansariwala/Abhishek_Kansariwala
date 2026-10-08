@@ -21,7 +21,7 @@
   <nav class="topnav">
     <a href="#install">Install</a>
     <a href="#hardware">Hardware</a>
-    <a href="#setup">Wi-Fi setup</a>
+    <a href="#setup">Build notes</a>
     <a href="#help">Help</a>
   </nav>
 </header>
@@ -33,9 +33,9 @@
     <p class="eyebrow">Browser firmware installer</p>
     <h1>Build your own<br /><span class="accent">Dasai Mochi</span></h1>
     <p class="lede">
-      A palm-sized robot on a Waveshare <strong>ESP32-C3</strong> — OLED face, microphone,
-      speaker and touch buttons. Plug it in and flash the firmware right here.
-      No Arduino IDE, no drivers, nothing to download.
+      A palm-sized desk companion on an <strong>ESP32-C3</strong> — an animated OLED
+      face that lights up when you pet it, and a little speaker for cute noises.
+      Plug it in and flash the firmware right here. No Arduino IDE, no drivers.
     </p>
 
     <div class="flash-card">
@@ -84,8 +84,8 @@
         <li>
           <span class="step-n">3</span>
           <div>
-            <h3>Hand over your Wi-Fi</h3>
-            <p>When flashing finishes, join the robot’s setup hotspot and give it your network and API keys. <a href="#setup">Details below.</a></p>
+            <h3>That’s it</h3>
+            <p>The robot reboots straight into its face. Nothing to configure — it runs entirely offline.</p>
           </div>
         </li>
       </ol>
@@ -102,38 +102,40 @@
           <tr><th>Part</th><th>Role</th><th>Notes</th></tr>
         </thead>
         <tbody>
-          <tr><td>Waveshare ESP32-C3 (Zero / Supermini)</td><td>Brain + Wi-Fi</td><td>Native USB-C, RISC-V core</td></tr>
-          <tr><td>SSD1306 0.96" OLED</td><td>The face</td><td>128×64, I²C</td></tr>
-          <tr><td>INMP441</td><td>Microphone</td><td>I²S digital mic</td></tr>
-          <tr><td>MAX98357A + 2 W speaker</td><td>Voice out</td><td>I²S class-D amp</td></tr>
-          <tr><td>3 × TTP223 touch pads</td><td>Input</td><td>Ask / menu / wake</td></tr>
-          <tr><td>LiPo cell + TP4056</td><td>Power</td><td>Use a protected cell</td></tr>
-          <tr><td>Slide switch</td><td>On / off</td><td>In line with the battery</td></tr>
+          <tr><td>ESP32-C3 Super Mini</td><td>Brain</td><td>Native USB-C, RISC-V core</td></tr>
+          <tr><td>1.3" 128×64 OLED</td><td>The face</td><td>See the SSD1306 vs SH1106 note below</td></tr>
+          <tr><td>MAX98357A I²S amp + small speaker</td><td>Sound</td><td>3 W class-D; there is no PWM buzzer</td></tr>
+          <tr><td>2 × TTP223 touch sensor</td><td>Petting</td><td>Avoid GPIO9 — see the note below</td></tr>
+          <tr><td>USB-C charger module</td><td>Charging</td><td>5 V / 4.2 V / 3.7 V type</td></tr>
+          <tr><td>2 × CR123 / 16340 3.7 V cell</td><td>Power</td><td>1300 mAh</td></tr>
+          <tr><td>Slide switch (3-pin)</td><td>On / off</td><td>In line with the battery</td></tr>
+          <tr><td>4 × brass heat insert, M3 screws</td><td>Case</td><td>Joins the printed top and bottom</td></tr>
         </tbody>
       </table>
     </div>
   </section>
 
-  <!-- ============================= WIFI SETUP ============================== -->
+  <!-- ============================= BUILD NOTES ============================= -->
   <section class="section" id="setup">
-    <h2>First-boot setup</h2>
+    <h2>Before you build</h2>
     <div class="cards">
       <article class="card">
-        <h3>1. Join the hotspot</h3>
-        <p>After the first boot the robot opens its own access point. Connect to it from your phone or laptop — the captive portal opens automatically.</p>
-        <p class="ssid">SSID <code id="setup-ssid">DasaiMochi-Setup</code></p>
+        <h3>Keep touch off GPIO9</h3>
+        <p>GPIO9 is the ESP32-C3’s BOOT pin. A stock TTP223 idles <em>low</em> and drives
+           push-pull, so a pad wired there holds the board in the serial bootloader at
+           every reset and the sketch never runs. The firmware defaults to GPIO7.</p>
       </article>
       <article class="card">
-        <h3>2. Enter credentials</h3>
-        <p>Give it your Wi-Fi SSID and password, plus any API keys the firmware needs for speech and weather.</p>
+        <h3>SSD1306 or SH1106?</h3>
+        <p>1.3" panels are usually SH1106; 0.96" ones are SSD1306. If the picture is
+           shifted sideways or wraps around, set <code>DM_DISPLAY_SH1106 1</code> in
+           <code>config.h</code> and rebuild.</p>
       </article>
       <article class="card">
-        <h3>3. It reboots</h3>
-        <p>The robot restarts, joins your network and shows its face. Hold the touch button and ask it something.</p>
+        <h3>No network, no accounts</h3>
+        <p>The firmware is entirely offline — no Wi-Fi, no microphone, no cloud and no
+           API keys. Flash it and it just works.</p>
       </article>
-    </div>
-    <div class="notice notice-info">
-      Keys are stored in the ESP32's own flash. Re-flashing erases them, so you'll redo this step after each update.
     </div>
   </section>
 
@@ -150,11 +152,11 @@
       <dt>Flashing works but the screen stays dark</dt>
       <dd>Check the OLED's I²C wiring and address (<code>0x3C</code> vs <code>0x3D</code>), and that it's a 3.3 V part.</dd>
 
-      <dt>It never joins my Wi-Fi</dt>
-      <dd>The ESP32-C3 is 2.4 GHz only. A 5 GHz-only SSID is invisible to it.</dd>
+      <dt>The face works but it is silent</dt>
+      <dd>Sound goes out over I²S to the MAX98357A, not to a buzzer pin. Check BCLK, LRCLK and DIN, and that the amp’s SD pin is not pulled low.</dd>
 
       <dt>I want to start clean</dt>
-      <dd>Re-run the installer and pick <em>Erase device</em> before installing. That wipes stored credentials too.</dd>
+      <dd>Re-run the installer and pick <em>Erase device</em> before installing.</dd>
     </dl>
   </section>
 

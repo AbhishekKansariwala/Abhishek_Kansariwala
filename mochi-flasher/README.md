@@ -25,7 +25,6 @@ are committed yet** — see `firmware/README.md`. Add them and the Install butto
 |---|---|
 | Colours, radius, fonts | `:root` at the top of `assets/css/styles.css` |
 | Name, tagline, copy | `index.html` — plain semantic HTML, no templating |
-| Setup hotspot SSID | `SETUP_SSID` at the top of `assets/js/main.js` |
 | Bill of materials | the `.bom` table in `index.html` |
 | Firmware version / boards | `firmware/manifest.json` (the page reads it at load) |
 
