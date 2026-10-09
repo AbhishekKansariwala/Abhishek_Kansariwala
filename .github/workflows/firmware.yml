@@ -12,6 +12,29 @@ on:
   workflow_dispatch:
 
 jobs:
+  core-tests:
+    name: Core logic tests (host)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # notify.cpp has no Arduino or BLE dependencies on purpose, so the
+      # fiddly parts (wrapping, truncation, non-ASCII, ring buffer) can be
+      # tested with a plain compiler instead of waiting on a board.
+      - name: Build and run
+        working-directory: firmware
+        run: |
+          g++ -std=c++17 -Wall -Wextra -Wshadow -Wconversion -Werror \
+              -I DasaiMochi test/test_notify.cpp DasaiMochi/notify.cpp -o /tmp/dmtest
+          /tmp/dmtest
+
+      - name: Re-run under AddressSanitizer and UBSan
+        working-directory: firmware
+        run: |
+          g++ -std=c++17 -g -fsanitize=address,undefined -fno-omit-frame-pointer \
+              -I DasaiMochi test/test_notify.cpp DasaiMochi/notify.cpp -o /tmp/dmtest_san
+          /tmp/dmtest_san
+
   build:
     name: Build ESP32-C3 firmware
     runs-on: ubuntu-latest
